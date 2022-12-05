@@ -142,14 +142,13 @@ function sungodgraphics(divine) {
     sg_rotate = (sg_rotate + divine.rtx.spin)%(2*Math.PI)
 }
 
-// movement code (need to make it smooth (i.e. pressing w and a moves you up and left together))
+// movement code
 var velY = 0,
     velX = 0,
     friction = 0.8, // friction
     keys = [];
-
-function update() {
-    requestAnimationFrame(update);
+function movementupdate() {
+    requestAnimationFrame(movementupdate);
 
     // check the keys and do the movement.
     if (keys['w']) {
@@ -196,19 +195,16 @@ function update() {
     }
 }
 
+// key events
 setup();
 setInterval(draw, 16);
-update();
-
-// key events
+movementupdate();
 document.body.addEventListener("keydown", function (e) {
     keys[e.key] = true;
 });
 document.body.addEventListener("keyup", function (e) {
     keys[e.key] = false;
 });
-
-
 
 
 
