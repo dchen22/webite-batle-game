@@ -6,13 +6,13 @@ const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 
 function setup() {
-    d1 = new Divine(WIDTH/2, HEIGHT/2);
+    p1 = new Divine(WIDTH/2, HEIGHT/2);
 }
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    d1.ch_display();
+    p1.ch_display();
     document.addEventListener('keydown', controls);
     document.addEventListener('keyup', controls);
     console.log('hello')
@@ -22,67 +22,9 @@ function draw() {
 
 function controls(e) {
     if (e.key.toLowerCase() == 'w') {
-        d1.py -= 4.0;
+        p1.py -= 4.0;
     }
 }
-
-// movement code (need to make it smooth (i.e. pressing w and a moves you up and left together))
-var velY = 0,
-    velX = 0,
-    friction = 0.78, // friction
-    keys = [];
-
-function update() {
-    requestAnimationFrame(update);
-
-    // check the keys and do the movement.
-    if (keys['w']) {
-        if (velY > -d1.stat.vel) {
-            velY--;
-        }
-    }
-
-    if (keys['s']) {
-        if (velY < d1.stat.vel) {
-            velY++;
-        }
-    }
-    if (keys['d']) {
-        if (velX < d1.stat.vel) {
-            velX++;
-        }
-    }
-    if (keys['a']) {
-        if (velX > -d1.stat.vel) {
-            velX--;
-        }
-    }
-
-    // apply some friction to y velocity.
-    velY *= friction;
-    d1.py += velY;
-
-    // apply some friction to x velocity.
-    velX *= friction;
-    d1.px += velX;
-
-    // bounds checking
-    if (d1.px >= WIDTH-5) {
-        d1.px = WIDTH-5;
-    } else if (d1.px <= 5) {
-        d1.px = 5;
-    }
-
-    if (d1.py > WIDTH-5) {
-        d1.py = WIDTH-5;
-    } else if (d1.py <= 5) {
-        d1.py = 5;
-    }
-}
-
-
-
-
 
 
 class Entity {
@@ -136,7 +78,8 @@ class Divine extends Being {
             'linewidth2': 8,
             'stroke1': 'rgb(255,220,0)',
             'stroke2': 'rgb(255,240,100)',
-            'r': 20
+            'r': 20,
+            'spin': 0.03
         };
     }
 
@@ -147,13 +90,13 @@ class Divine extends Being {
 }
 
 
-
+let sg_rotate = 0;
 function sungodgraphics(divine) {
     ctx.beginPath();
     ctx.fillStyle = divine.rtx.fill1;
     ctx.lineWidth = divine.rtx.linewidth1;
     ctx.strokeStyle = divine.rtx.stroke1;
-    ctx.arc(divine.px, divine.py, divine.rtx.r, 0, 1/3*Math.PI);
+    ctx.arc(divine.px, divine.py, divine.rtx.r, 0+sg_rotate, 1/3*Math.PI+sg_rotate);
     ctx.stroke();
     ctx.fill();
 
@@ -161,7 +104,7 @@ function sungodgraphics(divine) {
     ctx.fillStyle = divine.rtx.fill1;
     ctx.lineWidth = divine.rtx.linewidth1;
     ctx.strokeStyle = divine.rtx.stroke1;
-    ctx.arc(divine.px, divine.py, divine.rtx.r, 2/3*Math.PI, 3/3*Math.PI);
+    ctx.arc(divine.px, divine.py, divine.rtx.r, 2/3*Math.PI+sg_rotate, 3/3*Math.PI+sg_rotate);
     ctx.stroke();
     ctx.fill();
 
@@ -169,7 +112,7 @@ function sungodgraphics(divine) {
     ctx.fillStyle = divine.rtx.fill1;
     ctx.lineWidth = divine.rtx.linewidth1;
     ctx.strokeStyle = divine.rtx.stroke1;
-    ctx.arc(divine.px, divine.py, divine.rtx.r, 4/3*Math.PI, 5/3*Math.PI);
+    ctx.arc(divine.px, divine.py, divine.rtx.r, 4/3*Math.PI+sg_rotate, 5/3*Math.PI+sg_rotate);
     ctx.stroke();
     ctx.fill();
 
@@ -177,7 +120,7 @@ function sungodgraphics(divine) {
     ctx.fillStyle = divine.rtx.fill2;
     ctx.lineWidth = divine.rtx.linewidth2;
     ctx.strokeStyle = divine.rtx.stroke2;
-    ctx.arc(divine.px, divine.py, divine.rtx.r, 1/3*Math.PI, 2/3*Math.PI);
+    ctx.arc(divine.px, divine.py, divine.rtx.r, 1/3*Math.PI+sg_rotate, 2/3*Math.PI+sg_rotate);
     ctx.stroke();
     ctx.fill();
 
@@ -185,7 +128,7 @@ function sungodgraphics(divine) {
     ctx.fillStyle = divine.rtx.fill2;
     ctx.lineWidth = divine.rtx.linewidth2;
     ctx.strokeStyle = divine.rtx.stroke2;
-    ctx.arc(divine.px, divine.py, divine.rtx.r, 3/3*Math.PI, 4/3*Math.PI);
+    ctx.arc(divine.px, divine.py, divine.rtx.r, 3/3*Math.PI+sg_rotate, 4/3*Math.PI+sg_rotate);
     ctx.stroke();
     ctx.fill();
 
@@ -193,9 +136,64 @@ function sungodgraphics(divine) {
     ctx.fillStyle = divine.rtx.fill2;
     ctx.lineWidth = divine.rtx.linewidth2;
     ctx.strokeStyle = divine.rtx.stroke2;
-    ctx.arc(divine.px, divine.py, divine.rtx.r, 5/3*Math.PI, 6/3*Math.PI);
+    ctx.arc(divine.px, divine.py, divine.rtx.r, 5/3*Math.PI+sg_rotate, 6/3*Math.PI+sg_rotate);
     ctx.stroke();
     ctx.fill();
+    sg_rotate = (sg_rotate + divine.rtx.spin)%(2*Math.PI)
+}
+
+// movement code (need to make it smooth (i.e. pressing w and a moves you up and left together))
+var velY = 0,
+    velX = 0,
+    friction = 0.8, // friction
+    keys = [];
+
+function update() {
+    requestAnimationFrame(update);
+
+    // check the keys and do the movement.
+    if (keys['w']) {
+        if (velY > -p1.stat.vel) {
+            velY--;
+        }
+    }
+
+    if (keys['s']) {
+        if (velY < p1.stat.vel) {
+            velY++;
+        }
+    }
+    if (keys['d']) {
+        if (velX < p1.stat.vel) {
+            velX++;
+        }
+    }
+    if (keys['a']) {
+        if (velX > -p1.stat.vel) {
+            velX--;
+        }
+    }
+
+    // apply some friction to y velocity.
+    velY *= friction;
+    p1.py += velY;
+
+    // apply some friction to x velocity.
+    velX *= friction;
+    p1.px += velX;
+
+    // bounds checking
+    if (p1.px >= WIDTH-30) {
+        p1.px = WIDTH-30;
+    } else if (p1.px <= 5) {
+        p1.px = 5;
+    }
+
+    if (p1.py > WIDTH-750) {
+        p1.py = WIDTH-750;
+    } else if (p1.py <= 5) {
+        p1.py = 5;
+    }
 }
 
 setup();
